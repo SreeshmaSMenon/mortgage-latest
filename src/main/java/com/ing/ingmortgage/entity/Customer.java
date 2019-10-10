@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="customer")
+@Table(name = "customer")
 @Setter
 @Getter
 public class Customer {
@@ -46,7 +46,8 @@ public class Customer {
 	@UniqueElements
 	private String email;
 	@UniqueElements
-	private String password;	
-	@OneToMany(mappedBy="customer",cascade = CascadeType.ALL)
+	private String password;
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private List<LoanMaster> loanMasters;
+
 }
