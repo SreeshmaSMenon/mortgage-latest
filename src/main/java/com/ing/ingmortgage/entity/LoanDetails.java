@@ -22,7 +22,7 @@ public class LoanDetails {
 	private Long loanDetailsId;
 	private Double beginningBalance;
 	private Double scheduledPayment;
-	private Double pricipalAmount;
+	private Double principalAmount;
 	private Double interestAmount;
 	private LocalDate paymentDate;
 	private Double endingBalance;
@@ -31,5 +31,4 @@ public class LoanDetails {
     @JoinColumn(name="loanId", nullable=false)
 	private LoanMaster loanMaster;
 	
-
 }
