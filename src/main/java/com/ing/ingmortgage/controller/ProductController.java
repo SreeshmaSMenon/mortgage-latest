@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ing.ingmortgage.dto.ProductDescriptionDto;
+import com.ing.ingmortgage.dto.ProductDescription;
 import com.ing.ingmortgage.dto.ProductDesriptionResponse;
 import com.ing.ingmortgage.dto.ProductResponse;
 import com.ing.ingmortgage.service.ProductService;
@@ -53,7 +53,7 @@ public class ProductController {
 	{
 		LOGGER.info("inside product Description");
 		ProductDesriptionResponse productDesriptionResponse=new ProductDesriptionResponse();
-		ProductDescriptionDto productDescription=productServiceIntf.getProductDetails(productId);
+		ProductDescription productDescription=productServiceIntf.getProductDetails(productId);
 		productDesriptionResponse.setProductDescriptionDto(productDescription);
 		productDesriptionResponse.setSuccesCode(200);
 		productDesriptionResponse.setSuccessMessage(IngMortgageUtil.SUCCESS);

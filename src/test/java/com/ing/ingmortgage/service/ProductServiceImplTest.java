@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.ing.ingmortgage.dto.ProductDescriptionDto;
+import com.ing.ingmortgage.dto.ProductDescription;
 import com.ing.ingmortgage.dto.ProductDetails;
 import com.ing.ingmortgage.dto.ProductResponse;
 import com.ing.ingmortgage.entity.Category;
@@ -35,7 +35,7 @@ public class ProductServiceImplTest {
 	Product product1;
 	Product product2;
 	List<Product> products;
-	ProductDescriptionDto productDescription;
+	ProductDescription productDescription;
 	ProductDetails productDetails1;
 	ProductDetails productDetails2;
 	List<ProductDetails> productDetails;
@@ -60,7 +60,7 @@ public class ProductServiceImplTest {
 	category.setCategoryName("bank");
 	category.setProducts(products);
 	
-	productDescription=new ProductDescriptionDto();
+	productDescription=new ProductDescription();
 	productDescription.setProductId(1L);
 	
 	productDetails1=new ProductDetails();
@@ -104,7 +104,7 @@ public class ProductServiceImplTest {
 	{
 		
 		Mockito.when(productRepository.findById(product1.getProductId())).thenReturn(Optional.of(product1));
-		ProductDescriptionDto productDescription=productServiceImpl.getProductDetails(product1.getProductId());
+		ProductDescription productDescription=productServiceImpl.getProductDetails(product1.getProductId());
 		Assert.assertEquals(product1.getProductId(),productDescription.getProductId());
 
 	}
@@ -112,7 +112,7 @@ public class ProductServiceImplTest {
 	public void testGetProductDetails1()
 	{
 		Product product6=new Product();
-		ProductDescriptionDto productDescription=productServiceImpl.getProductDetails(product6.getProductId());
+		ProductDescription productDescription=productServiceImpl.getProductDetails(product6.getProductId());
 		 Assert.assertEquals(product1.getProductId(),productDescription.getProductId());
 
 	}
