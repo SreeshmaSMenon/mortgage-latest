@@ -45,6 +45,6 @@ public class LoanController {
 		loanResponse.setStatusMessage("Success");
 		loanResponse.setCustomerCredential(credentials);
 		logger.info("applyLoan() in  LoanController ended");
-	 return new ResponseEntity<LoanResponse>(loanResponse,HttpStatus.CREATED);
+	 return new ResponseEntity<>(loanResponse,HttpStatus.CREATED);
 	}
 }

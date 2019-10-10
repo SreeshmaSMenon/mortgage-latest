@@ -43,7 +43,7 @@ public class CategoryController {
 		response.setStatusMessage("Success");
 		List<CategoryDetails> categoryList=categoryService.getAllCategories();
 		response.setCategories(categoryList);
-		logger.info("getAllCategories() in  CategoryController started");
+		logger.info("getAllCategories() in  CategoryController ended");
 	    return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 	

@@ -47,4 +47,6 @@ public class Customer {
 	private String password;	
 	@OneToMany(mappedBy="customer",cascade = CascadeType.ALL)
 	private List<LoanMaster> loanMasters;
+	@OneToMany(mappedBy="customer",cascade = CascadeType.ALL)
+	private List<Account>accounts;
 }
