@@ -8,6 +8,6 @@ import lombok.Setter;
 public class ProductDesriptionResponse {
 	private Integer succesCode;
 	private String successMessage;
-	private ProductDescriptionDto productDescriptionDto;
+	private ProductDescription productDescriptionDto;
 
 }

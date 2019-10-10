@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.ing.ingmortgage.dto.ProductDescriptionDto;
+import com.ing.ingmortgage.dto.ProductDescription;
 import com.ing.ingmortgage.dto.ProductDesriptionResponse;
 import com.ing.ingmortgage.dto.ProductResponse;
 import com.ing.ingmortgage.entity.Category;
@@ -36,7 +36,7 @@ public class ProductControllerTest {
 	Product product1;
 	Product product2;
 	List<Product> products;
-	ProductDescriptionDto productDescription;
+	ProductDescription productDescription;
 	
 	
 	@Before
@@ -59,7 +59,7 @@ public class ProductControllerTest {
 	category.setCategoryName("bank");
 	category.setProducts(products);
 	
-	productDescription=new ProductDescriptionDto();
+	productDescription=new ProductDescription();
 	productDescription.setProductId(1L);
 	
 	}
@@ -80,7 +80,7 @@ public class ProductControllerTest {
 	{
 		Mockito.when(productService.getProductDetails(product1.getProductId())).thenReturn(productDescription);
 		ResponseEntity<ProductDesriptionResponse> actual=productController.getProductDetails(product1.getProductId());		
-		ResponseEntity<ProductDescriptionDto> expected=new ResponseEntity<ProductDescriptionDto>(productDescription,HttpStatus.OK);
+		ResponseEntity<ProductDescription> expected=new ResponseEntity<ProductDescription>(productDescription,HttpStatus.OK);
 		assertEquals(expected.getStatusCode().value(), actual.getStatusCodeValue());
 
 	}
