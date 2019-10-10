@@ -13,4 +13,5 @@ public class IngMortgageUtil {
 		public static final String FILE_EXTRACT_ISSUE="File extract issue";
 		public static final String NO_CATRGORIES_FOUND="Categories Not Found";
 		public static final String PRODUCT_CATEGORY_NOT_FOUND = "products for selected category not found";
+		public static final String NOT_AFFORDABLE_EXCEPTION="Customer is not eligible for loan due to low affordability";
 }
