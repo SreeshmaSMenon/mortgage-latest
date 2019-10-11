@@ -18,7 +18,7 @@ import com.ing.ingmortgage.entity.Category;
 import com.ing.ingmortgage.entity.Product;
 import com.ing.ingmortgage.exception.CommonException;
 import com.ing.ingmortgage.repository.CategoryRepository;
-import com.ing.ingmortgage.util.IngMortgageUtil;;
+import com.ing.ingmortgage.util.IngMortgageUtil;
 /**
  * @since 2019-10-03
  * This class includes methods for upload categories and retrieving all the categories.

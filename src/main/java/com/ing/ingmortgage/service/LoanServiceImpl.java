@@ -8,42 +8,47 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.ing.ingmortgage.dto.CustomerCredential;
 import com.ing.ingmortgage.dto.LoanRequest;
+import com.ing.ingmortgage.entity.Account;
 import com.ing.ingmortgage.entity.Affordability;
 import com.ing.ingmortgage.entity.Customer;
 import com.ing.ingmortgage.entity.LoanDetails;
 import com.ing.ingmortgage.entity.LoanMaster;
-import com.ing.ingmortgage.exception.CommonException;
+import com.ing.ingmortgage.exception.AffordabilityException;
+import com.ing.ingmortgage.exception.AgeException;
+import com.ing.ingmortgage.exception.EmailException;
 import com.ing.ingmortgage.repository.AffordabilityRepository;
 import com.ing.ingmortgage.repository.CustomerRepository;
-import com.ing.ingmortgage.repository.LoanRepository;
+import com.ing.ingmortgage.util.EMICalculator;
+import com.ing.ingmortgage.util.EmailValidator;
 import com.ing.ingmortgage.util.IngMortgageUtil;
 
 /**
- * @since 2019-10-10 This class includes methods for apply for loan, get loan
+ * @since 2019-10-10 
+ * This class includes methods for apply for loan, get loan
  *        details for given loan Id
  */
 @Service
 public class LoanServiceImpl implements LoanService {
-
-	@Autowired
-	private LoanRepository loanRepository;
+    private static Logger logger = LoggerFactory.getLogger(LoanServiceImpl.class);
 	@Autowired
 	private CustomerRepository customerRepository;
 	@Autowired
 	private AffordabilityRepository affordabilityRepository;
-
 	private static final SecureRandom RAND = new SecureRandom();
 	@Value("${password.length}")
 	private String passwordLength;
 	@Value("${interestRate}")
 	private String interestRate;
+	@Value("${initialBalance}")
+	private String initialBalance;
 
 	/**
 	 * @param loanRequest
@@ -53,19 +58,34 @@ public class LoanServiceImpl implements LoanService {
 	 */
 	@Override
 	public CustomerCredential applyLoan(LoanRequest loanRequest) {
+		logger.info("applyLoan() in  LoanServiceImpl started");
+		if(loanRequest.getAge()>50)
+		  throw new AgeException(IngMortgageUtil.AGE_EXCEPTION);
+		if(!new EmailValidator().validateEmail(loanRequest.getEmail()))
+			throw new EmailException(IngMortgageUtil.EMAIL_EXCEPTION);
 		if (!affordabilityCheck(loanRequest))
-			throw new CommonException(IngMortgageUtil.NOT_AFFORDABLE_EXCEPTION);
+			throw new AffordabilityException(IngMortgageUtil.NOT_AFFORDABLE_EXCEPTION);
 		CustomerCredential customerCredential = new CustomerCredential();
 		Customer customer = new Customer();
 		LoanMaster loanMaster = new LoanMaster();
 		BeanUtils.copyProperties(loanRequest, customer);
 		BeanUtils.copyProperties(loanRequest, loanMaster);
 		customer.setUserName(customer.getFirstName()+customer.getDob().getDayOfMonth()+customer.getDob().getYear());
-		customer.setPassword(generatePassword(Integer.parseInt(passwordLength)).toString());
+		Optional<String> password=generatePassword(Integer.parseInt(passwordLength));
+		if(password.isPresent())
+		 customer.setPassword(password.get());
 		List<LoanMaster> loans = new ArrayList<>();
 		loanMaster.setLoanStatus("open");
 		loanMaster.setCustomer(customer);
 		List<LoanDetails> loanDetails = getLoanDetails(loanRequest, loanMaster);
+		List<Account> accounts=new ArrayList<>();
+		Account account=new Account();
+		Double acc=Math.floor(Math.random()*9_000_000_000L)+1_000_000_000;
+		account.setAccountNo(acc.longValue());
+		account.setBalance(Double.parseDouble(initialBalance));
+		account.setCustomer(customer);
+		accounts.add(account);
+		customer.setAccounts(accounts);
 		loanMaster.setLoanDetails(loanDetails);
 		loans.add(loanMaster);
 		customer.setLoanMasters(loans);
@@ -74,13 +94,13 @@ public class LoanServiceImpl implements LoanService {
 	    customerCredential.setLoanId(customer.getLoanMasters().get(0).getLoanId());
 		customerCredential.setUserName(customer.getUserName());
 		customerCredential.setPassword(customer.getPassword());
+		logger.info("applyLoan() in  LoanServiceImpl ended");
 		return customerCredential;
 	}
 
 	/**
 	 * @param length
 	 * @return Optional<String> which returns auto generated password.
-	 * @since 2019-10-10
 	 */
 	private static Optional<String> generatePassword(final int length) {
 		if (length < 1) {
@@ -90,12 +110,18 @@ public class LoanServiceImpl implements LoanService {
 		RAND.nextBytes(salt);
 		return Optional.of(Base64.getEncoder().encodeToString(salt));
 	}
-
+	/**
+	 * @param loanRequest
+	 * @param loanMaster
+	 * @return List<LoanDetails>
+	 * This method will calculate and populate loan details
+	 */   
 	private List<LoanDetails> getLoanDetails(LoanRequest loanRequest, LoanMaster loanMaster) {
 		Double beginningBalance = loanRequest.getLoanAmount();
+		LocalDate paymentDate=LocalDate.now();
 		List<LoanDetails> loanDetails = new ArrayList<>();
 		Integer noOfMonths = loanRequest.getTenure() * 12;
-		double emi = emiCalculator(loanRequest.getLoanAmount(), Double.parseDouble(interestRate),
+		double emi = EMICalculator.calculatedEMI(loanRequest.getLoanAmount(), Double.parseDouble(interestRate),
 				loanRequest.getTenure());
 		DecimalFormat df = new DecimalFormat("0.00");
 		for (int i = 0; i < noOfMonths; i++) {
@@ -106,29 +132,24 @@ public class LoanServiceImpl implements LoanService {
 			loanDetail.setBeginningBalance(Double.parseDouble(df.format(beginningBalance)));
 			loanDetail.setEndingBalance(Double.parseDouble(df.format(endingBalance)));
 			loanDetail.setInterestAmount(Double.parseDouble(df.format(monthlyInterest)));
-			loanDetail.setPaymentDate(LocalDate.now());
+			loanDetail.setPaymentDate(paymentDate);
 			loanDetail.setPricipalAmount(Double.parseDouble(df.format(emiPrincipalAmount)));
 			loanDetail.setScheduledPayment(Double.parseDouble(df.format(emi)));
 			loanDetail.setStatus("Not Paid");
 			loanDetail.setLoanMaster(loanMaster);
-			beginningBalance = endingBalance;
 			loanDetails.add(loanDetail);
+			paymentDate=paymentDate.plusMonths(1);
+			beginningBalance = endingBalance;
 		}
 
 		return loanDetails;
 	}
 
-	private Double emiCalculator(Double principal, Double rateOfInterest, Integer tenure) {
-		Double emi;
-
-		rateOfInterest = rateOfInterest / (12 * 100); // one month interest
-		tenure = tenure * 12; // one month period
-		emi = (principal * rateOfInterest * (Double) Math.pow(1 + rateOfInterest, tenure))
-				/ (Double) (Math.pow(1 + rateOfInterest, tenure) - 1);
-
-		return (emi);
-	}
-
+	/**
+	 * @param loanRequest
+	 * @return boolean
+	 * This method will check whether the customer is affordable to apply for loan
+	 */   
 	private boolean affordabilityCheck(LoanRequest loanRequest) {
 		boolean affordabilityStatus = false;
 		String maritalStatus = loanRequest.getMaritalStatus().toLowerCase();
@@ -138,7 +159,7 @@ public class LoanServiceImpl implements LoanService {
 		if (optionalAffordability.isPresent())
 			affordableAmount = optionalAffordability.get().getAffordableAmount();
 		Double balanceAmount = loanRequest.getMonthlyIncome() - loanObligation - affordableAmount;
-		if (Double.compare(balanceAmount, emiCalculator(loanRequest.getLoanAmount(), Double.parseDouble(interestRate),
+		if (Double.compare(balanceAmount, EMICalculator.calculatedEMI(loanRequest.getLoanAmount(), Double.parseDouble(interestRate),
 				loanRequest.getTenure())) >= 0) {
 			affordabilityStatus = true;
 		}

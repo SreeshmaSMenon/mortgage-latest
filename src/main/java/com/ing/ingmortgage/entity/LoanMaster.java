@@ -32,6 +32,7 @@ public class LoanMaster {
 	private String propertyStreet;
 	private String propertySector;
 	private Long pincode;
+	private Integer tenure;
 	@ManyToOne
     @JoinColumn(name="cif", nullable=false)
 	private Customer customer;

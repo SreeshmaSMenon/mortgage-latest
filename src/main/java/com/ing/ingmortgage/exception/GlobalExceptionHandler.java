@@ -19,5 +19,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	}
 	
+	@ExceptionHandler(EmailException.class)
+	public ResponseEntity<ErrorResponse> emailExceptionHandler(EmailException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value(),
+				request.getDescription(false));
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 
+	}
+	@ExceptionHandler(AgeException.class)
+	public ResponseEntity<ErrorResponse> ageExceptionHandler(AgeException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value(),
+				request.getDescription(false));
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
+	}
 }
