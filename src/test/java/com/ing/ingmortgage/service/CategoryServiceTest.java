@@ -2,7 +2,6 @@ package com.ing.ingmortgage.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,7 +61,6 @@ public class CategoryServiceTest {
 		List<CategoryDetails> categoryDetailsList = categoryServiceImpl.getAllCategories();
 		assertNotNull(categoryDetailsList);
 	}
-
 
 	@Test
 	public void testUpload() {
