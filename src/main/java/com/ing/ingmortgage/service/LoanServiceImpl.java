@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +21,8 @@ import com.ing.ingmortgage.entity.Affordability;
 import com.ing.ingmortgage.entity.Customer;
 import com.ing.ingmortgage.entity.LoanDetails;
 import com.ing.ingmortgage.entity.LoanMaster;
+import com.ing.ingmortgage.exception.AffordabilityException;
 import com.ing.ingmortgage.exception.AgeException;
-import com.ing.ingmortgage.exception.CommonException;
 import com.ing.ingmortgage.exception.EmailException;
 import com.ing.ingmortgage.repository.AffordabilityRepository;
 import com.ing.ingmortgage.repository.CustomerRepository;
@@ -34,7 +37,7 @@ import com.ing.ingmortgage.util.IngMortgageUtil;
  */
 @Service
 public class LoanServiceImpl implements LoanService {
-
+    private static Logger logger = LoggerFactory.getLogger(LoanServiceImpl.class);
 	@Autowired
 	private CustomerRepository customerRepository;
 	@Autowired
@@ -55,12 +58,13 @@ public class LoanServiceImpl implements LoanService {
 	 */
 	@Override
 	public CustomerCredential applyLoan(LoanRequest loanRequest) {
+		logger.info("applyLoan() in  LoanServiceImpl started");
 		if(loanRequest.getAge()>50)
 		  throw new AgeException(IngMortgageUtil.AGE_EXCEPTION);
 		if(!new EmailValidator().validateEmail(loanRequest.getEmail()))
 			throw new EmailException(IngMortgageUtil.EMAIL_EXCEPTION);
 		if (!affordabilityCheck(loanRequest))
-			throw new CommonException(IngMortgageUtil.NOT_AFFORDABLE_EXCEPTION);
+			throw new AffordabilityException(IngMortgageUtil.NOT_AFFORDABLE_EXCEPTION);
 		CustomerCredential customerCredential = new CustomerCredential();
 		Customer customer = new Customer();
 		LoanMaster loanMaster = new LoanMaster();
@@ -90,6 +94,7 @@ public class LoanServiceImpl implements LoanService {
 	    customerCredential.setLoanId(customer.getLoanMasters().get(0).getLoanId());
 		customerCredential.setUserName(customer.getUserName());
 		customerCredential.setPassword(customer.getPassword());
+		logger.info("applyLoan() in  LoanServiceImpl ended");
 		return customerCredential;
 	}
 

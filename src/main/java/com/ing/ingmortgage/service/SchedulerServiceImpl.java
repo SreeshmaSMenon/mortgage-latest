@@ -2,6 +2,9 @@ package com.ing.ingmortgage.service;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,9 +16,13 @@ import com.ing.ingmortgage.repository.AccountRepository;
 import com.ing.ingmortgage.repository.CustomerRepository;
 import com.ing.ingmortgage.repository.LoanDetailsRepository;
 import com.ing.ingmortgage.repository.LoanRepository;
-
+/**
+ * @since 2019-10-10 
+ * This class includes methods update the loan status and amount
+ */
 @Service
 public class SchedulerServiceImpl implements SchedulerService{
+    private static Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
 	@Autowired
 	CustomerRepository customerRepository;
@@ -28,8 +35,13 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Autowired
     @Value("${cif}")
 	private String cif;
+	/**
+	 * @param cif
+	 * This method will update the status of loan for given cif if the loan account has enough balance.
+	 */
 	@Override
 	public void updateAmountAndStatus(Long cif) {
+		logger.info("updateAmountAndStatus() in  SchedulerServiceImpl started");
 		 Optional<Customer> optionalCustomer=customerRepository.findById(cif);
 		 if(optionalCustomer.isPresent()) {
 			 List<LoanMaster> loans=loanRepository.findByCustomerAndLoanStatus(optionalCustomer.get(),"open");
@@ -47,6 +59,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 				 
 			 });
 		 }
+		logger.info("updateAmountAndStatus() in  SchedulerServiceImpl started");
 	}
 
 }
