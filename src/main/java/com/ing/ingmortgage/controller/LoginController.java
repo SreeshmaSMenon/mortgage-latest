@@ -17,7 +17,7 @@ import com.ing.ingmortgage.util.IngMortgageUtil;
 
 /**
  * @since 2019-10-10
- * This class contains the  for login
+ * This class  have the method for login
  */
 @RestController
 @CrossOrigin(allowedHeaders = { "*", "*/" }, origins = { "*", "*/" })

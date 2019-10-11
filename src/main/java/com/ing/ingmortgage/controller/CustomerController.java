@@ -14,15 +14,24 @@ import com.ing.ingmortgage.dto.LoansResponse;
 import com.ing.ingmortgage.service.CustomerService;
 import com.ing.ingmortgage.util.IngMortgageUtil;
 
+/**
+ * @since 2019-10-10
+ * This class  have the a method for get all loans for a particular customer
+ */
 @RestController
 @CrossOrigin(allowedHeaders = { "*", "*/" }, origins = { "*", "*/" })
 public class CustomerController {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class);
 	
 	@Autowired
 	CustomerService customerService;
 	
+	/**
+	 * @PathVariable customerId
+	 * @return ResponseEntity of getLoans which includes LoansResponse.
+	 *
+	 */
 	@GetMapping("/customers/{customerId}/loans")
      public ResponseEntity<LoansResponse> getLoans(@PathVariable Long customerId)
      {

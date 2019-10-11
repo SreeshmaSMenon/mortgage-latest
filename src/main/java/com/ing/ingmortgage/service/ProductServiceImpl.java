@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ing.ingmortgage.dto.ProductDescription;
+import com.ing.ingmortgage.dto.ProductDescriptionDto;
 import com.ing.ingmortgage.dto.ProductDetails;
 import com.ing.ingmortgage.dto.ProductResponse;
 import com.ing.ingmortgage.entity.Product;
@@ -44,9 +44,9 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 
-	public ProductDescription getProductDetails(Long productId) {
+	public ProductDescriptionDto getProductDetails(Long productId) {
 		
-		ProductDescription productDescription=new ProductDescription();
+		ProductDescriptionDto productDescription=new ProductDescriptionDto();
 		
 		Optional<Product> product=productRepository.findById(productId);
 		if(product.isPresent())

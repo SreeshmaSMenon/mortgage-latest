@@ -11,7 +11,7 @@ import com.ing.ingmortgage.entity.Customer;
 public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
 	public Customer findByUserNameAndPassword(String userName, String password);
-
 	public Optional<Customer> findByUserName(String username);
+	public Optional<Customer> findByEmailOrPhoneNumber(String email,Long phoneNumber);
 
 }

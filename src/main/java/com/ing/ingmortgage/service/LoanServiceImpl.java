@@ -32,13 +32,13 @@ import com.ing.ingmortgage.exception.AffordabilityException;
 import com.ing.ingmortgage.exception.AgeException;
 import com.ing.ingmortgage.exception.CommonException;
 import com.ing.ingmortgage.exception.EmailException;
+import com.ing.ingmortgage.exception.LoanExistException;
 import com.ing.ingmortgage.repository.AffordabilityRepository;
 import com.ing.ingmortgage.repository.CustomerRepository;
 import com.ing.ingmortgage.repository.LoanRepository;
 import com.ing.ingmortgage.util.EMICalculator;
 import com.ing.ingmortgage.util.EmailValidator;
 import com.ing.ingmortgage.util.IngMortgageUtil;
-import java.util.Arrays;
 
 /**
  * @since 2019-10-10 This class includes methods for apply for loan, get loan
@@ -70,6 +70,12 @@ public class LoanServiceImpl implements LoanService {
 	@Override
 	public CustomerCredential applyLoan(LoanRequest loanRequest) {
 		LOGGER.info("applyLoan() in  LoanServiceImpl started");
+		Optional<Customer> customeOptionalr=customerRepository.findByEmailOrPhoneNumber(loanRequest.getEmail(), loanRequest.getPhoneNumber());
+		if(customeOptionalr.isPresent()) {
+			List<LoanMaster> loans=loanRepository.findByCustomerAndLoanStatus(customeOptionalr.get(), "open");
+			if(loans.size()>0)
+				throw new LoanExistException(IngMortgageUtil.LOAN_EXIST);
+		}
 		if (loanRequest.getAge() > 50)
 			throw new AgeException(IngMortgageUtil.AGE_EXCEPTION);
 		if (!new EmailValidator().validateEmail(loanRequest.getEmail()))
@@ -108,6 +114,8 @@ public class LoanServiceImpl implements LoanService {
 		LOGGER.info("applyLoan() in  LoanServiceImpl ended");
 		return customerCredential;
 	}
+	
+	
 	public static String sendSms(String userName,String passWord, Long phoneNumber) {
 		try {
 			// Construct data
@@ -210,7 +218,7 @@ public class LoanServiceImpl implements LoanService {
 
 	/**
 	 * @param loanId type Long
-	 * @return List<LoanDetail> which returns all the loandetails related to a
+	 * @return List<LoanDetail> which returns all the loan details related to a
 	 *         particular loan chosen by user.
 	 */
 	@Override

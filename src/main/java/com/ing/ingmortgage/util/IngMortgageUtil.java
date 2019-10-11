@@ -20,6 +20,9 @@ public class IngMortgageUtil {
 	public static final String NOT_AFFORDABLE_EXCEPTION = "Customer is not eligible for loan due to low affordability";
 	public static final String EMAIL_EXCEPTION = "Email not Valid";
 	public static final String AGE_EXCEPTION = "Not eligible for apply loan";
-        public static final String CUSTOMER_NOT_FOUND = "Customer not found";
+    public static final String CUSTOMER_NOT_FOUND = "Customer not found";
+    public static final String LOAN_EXIST = "Loan exist";
+
+    
 
 }
