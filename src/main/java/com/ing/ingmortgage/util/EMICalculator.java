@@ -1,9 +1,11 @@
 package com.ing.ingmortgage.util;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class EMICalculator {
+
+	EMICalculator() {
+
+	}
+
 	public static Double calculatedEMI(Double principal, Double rateOfInterest, Integer tenure) {
 		Double emi;
 		rateOfInterest = rateOfInterest / (12 * 100); // one month interest

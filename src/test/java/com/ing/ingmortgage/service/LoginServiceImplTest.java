@@ -1,7 +1,4 @@
 package com.ing.ingmortgage.service;
-
-import java.util.Optional;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import com.ing.ingmortgage.dto.LoginRequest;
 import com.ing.ingmortgage.dto.LoginResponse;
 import com.ing.ingmortgage.entity.Customer;

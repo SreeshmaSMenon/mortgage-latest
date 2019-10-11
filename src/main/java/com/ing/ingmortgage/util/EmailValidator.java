@@ -7,7 +7,7 @@ public class EmailValidator {// Email Regex java
 
 	private static final String EMAIL_REGEX = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
 
-	private static Pattern pattern;
+	private Pattern pattern;
 	
 	public EmailValidator() {
 		 pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);

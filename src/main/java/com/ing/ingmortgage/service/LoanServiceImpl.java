@@ -60,7 +60,7 @@ public class LoanServiceImpl implements LoanService {
 	private String interestRate;
 	@Value("${initialBalance}")
 	private String initialBalance;
-	
+
 	/**
 	 * @param loanRequest
 	 * @return CustomerCredential which includes cif,loan Id,success code and
@@ -70,10 +70,11 @@ public class LoanServiceImpl implements LoanService {
 	@Override
 	public CustomerCredential applyLoan(LoanRequest loanRequest) {
 		LOGGER.info("applyLoan() in  LoanServiceImpl started");
-		Optional<Customer> customeOptionalr=customerRepository.findByEmailOrPhoneNumber(loanRequest.getEmail(), loanRequest.getPhoneNumber());
-		if(customeOptionalr.isPresent()) {
-			List<LoanMaster> loans=loanRepository.findByCustomerAndLoanStatus(customeOptionalr.get(), "open");
-			if(loans.size()>0)
+		Optional<Customer> customeOptionalr = customerRepository.findByEmailOrPhoneNumber(loanRequest.getEmail(),
+				loanRequest.getPhoneNumber());
+		if (customeOptionalr.isPresent()) {
+			List<LoanMaster> loans = loanRepository.findByCustomerAndLoanStatus(customeOptionalr.get(), "open");
+			if (!loans.isEmpty())
 				throw new LoanExistException(IngMortgageUtil.LOAN_EXIST);
 		}
 		if (loanRequest.getAge() > 50)
@@ -109,20 +110,19 @@ public class LoanServiceImpl implements LoanService {
 		customer = customerRepository.save(customer);
 		customerCredential.setCif(customer.getCif());
 		customerCredential.setLoanId(customer.getLoanMasters().get(0).getLoanId());
-		sendSms(customer.getUserName(),customer.getPassword(),customer.getPhoneNumber());
-		
+		sendSms(customer.getUserName(), customer.getPassword(), customer.getPhoneNumber());
+
 		LOGGER.info("applyLoan() in  LoanServiceImpl ended");
 		return customerCredential;
 	}
-	
-	
-	public static String sendSms(String userName,String passWord, Long phoneNumber) {
+
+	public static String sendSms(String userName, String passWord, Long phoneNumber) {
 		try {
 			// Construct data
 			String apiKey = "apikey=" + "jNZTppE/axs-wck2MWHQmmTC9OE4wlQdpfCX7n1O89";
-			String message = "&message=" + "Hi, Your UserName is "+ userName +" and password is "+passWord;
+			String message = "&message=" + "Hi, Your UserName is " + userName + " and password is " + passWord;
 			String sender = "&sender=" + "TXTLCL";
-			String numbers = "&numbers=" +"91"+ phoneNumber.toString();
+			String numbers = "&numbers=" + "91" + phoneNumber.toString();
 
 			// Send data
 			HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
@@ -141,10 +141,11 @@ public class LoanServiceImpl implements LoanService {
 			LOGGER.info("SMS sent");
 			return stringBuffer.toString();
 		} catch (Exception e) {
-			LOGGER.info("Error SMS " + e);
+			LOGGER.info(String.format("Error SMS ", e));
 			return "Error " + e;
 		}
 	}
+
 	/**
 	 * @param length
 	 * @return Optional<String> which returns auto generated password.
