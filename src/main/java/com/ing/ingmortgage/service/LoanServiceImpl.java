@@ -146,7 +146,7 @@ public class LoanServiceImpl implements LoanService {
 		}
 		byte[] salt = new byte[length];
 		RAND.nextBytes(salt);
-		return Optional.of(salt.toString());
+		return Optional.of(Arrays.toString(salt));
 	}
 
 	/**
