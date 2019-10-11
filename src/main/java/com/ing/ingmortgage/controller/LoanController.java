@@ -1,5 +1,6 @@
 package com.ing.ingmortgage.controller;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -63,7 +64,7 @@ public class LoanController {
 	 *         details,validate,calculate scheduler and save to respective tables
 	 */
 	@PostMapping("/")
-	public ResponseEntity<LoanResponse> applyLoan(@Valid @RequestBody LoanRequest loanRequest) {
+	public ResponseEntity<LoanResponse> applyLoan(@Valid @RequestBody LoanRequest loanRequest)throws NoSuchAlgorithmException {
 		LOGGER.info("applyLoan() in  LoanController started");
 		LoanResponse loanResponse = new LoanResponse();
 		CustomerCredential credentials = loanService.applyLoan(loanRequest);

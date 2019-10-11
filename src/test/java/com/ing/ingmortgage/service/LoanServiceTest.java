@@ -2,6 +2,7 @@ package com.ing.ingmortgage.service;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +95,7 @@ public class LoanServiceTest {
 	}
 	
 	@Test
-	public void testApplyLoan() {
+	public void testApplyLoan()throws NoSuchAlgorithmException {
 		Optional<Affordability> affordabilityOptional=Optional.of(affordability);
 		Mockito.when(customerRepository.save(Mockito.any())).thenReturn(customer);
 		Mockito.when(affordabilityRepository.findByMaritalStatus(Mockito.any())).thenReturn(affordabilityOptional);
@@ -103,26 +104,26 @@ public class LoanServiceTest {
 	}
 	
 	@Test(expected = AgeException.class)
-	public void testAgeException() {
+	public void testAgeException()throws NoSuchAlgorithmException {
 		loanRequest.setAge(55);
 		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);
         assertNotNull(customerCredential);
 	}
 	@Test(expected = EmailException.class)
-	public void testEmailException() {
+	public void testEmailException()throws NoSuchAlgorithmException {
 		loanRequest.setEmail("sree1213123");
 		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);
         assertNotNull(customerCredential);
 	}
 	@Test(expected = AffordabilityException.class)
-	public void testAffordabilityException() {
+	public void testAffordabilityException()throws NoSuchAlgorithmException {
 		loanRequest.setLoanObligation(20000.0);
 		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);
         assertNotNull(customerCredential);
 	}
 	
 	@Test(expected = LoanExistException.class)
-	public void testLoanExistException() {
+	public void testLoanExistException()throws NoSuchAlgorithmException {
 		Mockito.when(customerRepository.findByEmailOrPhoneNumber(Mockito.any(),Mockito.any())).thenReturn(Optional.of(customer));
 		Mockito.when(loanRepository.findByCustomerAndLoanStatus(Mockito.any(),Mockito.any())).thenReturn(loanMasters);
 		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);

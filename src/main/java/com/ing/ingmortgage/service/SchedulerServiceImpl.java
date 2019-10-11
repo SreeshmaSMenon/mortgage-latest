@@ -53,7 +53,8 @@ public class SchedulerServiceImpl implements SchedulerService {
 				Double accountBalance = account.getBalance();
 				List<LoanDetails> loanDetails = loanDetailsRepository
 						.findByLoanMasterAndStatusAndPaymentDateLessThanEqual(loan, "Not Paid", LocalDate.now());
-				if (loanDetails.isEmpty() && accountBalance >= loanDetails.get(0).getScheduledPayment()) {
+				if (!loanDetails.isEmpty()
+						&& Double.compare(accountBalance, loanDetails.get(0).getScheduledPayment()) >= 0) {
 					loanDetailsRepository.updateStatus("paid", loan, loanDetails.get(0).getPaymentDate());
 					if (loanDetails.get(0).getEndingBalance() == 0)
 						loanRepository.updateStatus("close", loan.getLoanId());

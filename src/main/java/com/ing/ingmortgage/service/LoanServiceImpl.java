@@ -5,11 +5,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +53,6 @@ public class LoanServiceImpl implements LoanService {
 	private AffordabilityRepository affordabilityRepository;
 	@Autowired
 	private LoanRepository loanRepository;
-	private static final SecureRandom RAND = new SecureRandom();
 	@Value("${password.length}")
 	private String passwordLength;
 	@Value("${interestRate}")
@@ -68,7 +67,7 @@ public class LoanServiceImpl implements LoanService {
 	 *         details,validate,calculate scheduler and save to respective tables
 	 */
 	@Override
-	public CustomerCredential applyLoan(LoanRequest loanRequest) {
+	public CustomerCredential applyLoan(LoanRequest loanRequest)throws NoSuchAlgorithmException {
 		LOGGER.info("applyLoan() in  LoanServiceImpl started");
 		Optional<Customer> customeOptionalr = customerRepository.findByEmailOrPhoneNumber(loanRequest.getEmail(),
 				loanRequest.getPhoneNumber());
@@ -89,9 +88,7 @@ public class LoanServiceImpl implements LoanService {
 		BeanUtils.copyProperties(loanRequest, customer);
 		BeanUtils.copyProperties(loanRequest, loanMaster);
 		customer.setUserName(customer.getFirstName() + customer.getDob().getDayOfMonth() + customer.getDob().getYear());
-		Optional<String> password = generatePassword(Integer.parseInt(passwordLength));
-		if (password.isPresent())
-			customer.setPassword(password.get());
+		customer.setPassword(generatePassword(loanRequest.getFirstName()));
 		List<LoanMaster> loans = new ArrayList<>();
 		loanMaster.setLoanStatus("open");
 		loanMaster.setCustomer(customer);
@@ -150,13 +147,19 @@ public class LoanServiceImpl implements LoanService {
 	 * @param length
 	 * @return Optional<String> which returns auto generated password.
 	 */
-	private static Optional<String> generatePassword(final int length) {
-		if (length < 1) {
-			return Optional.empty();
+	private String generatePassword(String passwordToHash) throws NoSuchAlgorithmException {
+		String generatedPassword = null;
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		md.update(passwordToHash.getBytes());
+		byte[] bytes = md.digest();
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
 		}
-		byte[] salt = new byte[length];
-		RAND.nextBytes(salt);
-		return Optional.of(Arrays.toString(salt));
+
+		generatedPassword = sb.toString();
+		return generatedPassword.substring(0, Integer.parseInt(passwordLength));
 	}
 
 	/**
