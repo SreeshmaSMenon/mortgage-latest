@@ -1,6 +1,7 @@
 package com.ing.ingmortgage.controller;
 
 import java.util.List;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,25 @@ import com.ing.ingmortgage.dto.LoanDetailResponse;
 import com.ing.ingmortgage.service.LoanService;
 import com.ing.ingmortgage.util.IngMortgageUtil;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.ing.ingmortgage.dto.CustomerCredential;
+import com.ing.ingmortgage.dto.LoanRequest;
+import com.ing.ingmortgage.dto.LoanResponse;
+/**
+ * @since 2019-10-10
+ * This class includes methods for apply for loan, get loan details for given loan Id
+ */
 @RestController
 @RequestMapping("/loans")
+@CrossOrigin(allowedHeaders = {"*","*/"}, origins = {"*","*/"})
 public class LoanController {
-
-	@Autowired
-	LoanService loanService;
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoanController.class);
+    @Autowired
+    private LoanService loanService;
+
 
 	/**
 	 * 
@@ -45,4 +57,21 @@ public class LoanController {
 		return new ResponseEntity<>(loanDetailResponse, HttpStatus.OK);
 	}
 
+	/**
+	 * @param loanRequest
+	 * @return ResponseEntity of LoanResponse which includes cif,loan Id,success code and success message
+	 * This method will accept all loan application details,validate,calculate scheduler and save to 
+	 * respective tables
+	 */
+    @PostMapping("/")
+	public ResponseEntity<LoanResponse>applyLoan(@Valid@RequestBody LoanRequest loanRequest){
+		LOGGER.info("applyLoan() in  LoanController started");
+		LoanResponse loanResponse=new LoanResponse();
+		CustomerCredential credentials=loanService.applyLoan(loanRequest);
+		loanResponse.setStatusCode(200);
+		loanResponse.setStatusMessage("Success");
+		loanResponse.setCustomerCredential(credentials);
+		LOGGER.info("applyLoan() in  LoanController ended");
+	 return new ResponseEntity<>(loanResponse,HttpStatus.CREATED);
+	}
 }
