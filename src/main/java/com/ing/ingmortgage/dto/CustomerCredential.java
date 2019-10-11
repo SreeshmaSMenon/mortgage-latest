@@ -6,8 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CustomerCredential {
-	 private Long cif;
-	 private Long loanId;
-	 private String userName;
-	 private String password;
+	private Long cif;
+	private Long loanId;
 }

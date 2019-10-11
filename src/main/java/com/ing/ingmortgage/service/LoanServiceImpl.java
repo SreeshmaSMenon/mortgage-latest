@@ -1,5 +1,10 @@
 package com.ing.ingmortgage.service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -54,7 +59,7 @@ public class LoanServiceImpl implements LoanService {
 	private String interestRate;
 	@Value("${initialBalance}")
 	private String initialBalance;
-
+	
 	/**
 	 * @param loanRequest
 	 * @return CustomerCredential which includes cif,loan Id,success code and
@@ -97,12 +102,40 @@ public class LoanServiceImpl implements LoanService {
 		customer = customerRepository.save(customer);
 		customerCredential.setCif(customer.getCif());
 		customerCredential.setLoanId(customer.getLoanMasters().get(0).getLoanId());
-		customerCredential.setUserName(customer.getUserName());
-		customerCredential.setPassword(customer.getPassword());
+		sendSms(customer.getUserName(),customer.getPassword(),customer.getPhoneNumber());
+		
 		LOGGER.info("applyLoan() in  LoanServiceImpl ended");
 		return customerCredential;
 	}
+	public static String sendSms(String userName,String passWord, Long phoneNumber) {
+		try {
+			// Construct data
+			String apiKey = "apikey=" + "jNZTppE/axs-wck2MWHQmmTC9OE4wlQdpfCX7n1O89";
+			String message = "&message=" + "Hi, Your UserName is "+ userName +" and password is "+passWord;
+			String sender = "&sender=" + "TXTLCL";
+			String numbers = "&numbers=" +"91"+ phoneNumber.toString();
 
+			// Send data
+			HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
+			String data = apiKey + numbers + message + sender;
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+			conn.getOutputStream().write(data.getBytes(StandardCharsets.UTF_8));
+			final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			final StringBuilder stringBuffer = new StringBuilder();
+			String line;
+			while ((line = rd.readLine()) != null) {
+				stringBuffer.append(line);
+			}
+			rd.close();
+			LOGGER.info("SMS sent");
+			return stringBuffer.toString();
+		} catch (Exception e) {
+			LOGGER.info("Error SMS " + e);
+			return "Error " + e;
+		}
+	}
 	/**
 	 * @param length
 	 * @return Optional<String> which returns auto generated password.
@@ -113,7 +146,7 @@ public class LoanServiceImpl implements LoanService {
 		}
 		byte[] salt = new byte[length];
 		RAND.nextBytes(salt);
-		return Optional.of(Base64.getEncoder().encodeToString(salt));
+		return Optional.of(salt.toString());
 	}
 
 	/**
