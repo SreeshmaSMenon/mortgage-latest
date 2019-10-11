@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.ing.ingmortgage.service.SchedulerService;
 @Component
 public class ScheduledTasks {
-    private static Logger LOGGER = LoggerFactory.getLogger(ScheduledTasks.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTasks.class);
     @Autowired
 	SchedulerService schedulerService;
     @Value("${cif}")

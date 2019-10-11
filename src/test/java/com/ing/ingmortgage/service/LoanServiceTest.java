@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,27 +18,36 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.ing.ingmortgage.dto.CustomerCredential;
+import com.ing.ingmortgage.dto.LoanDetail;
 import com.ing.ingmortgage.dto.LoanRequest;
 import com.ing.ingmortgage.entity.Affordability;
 import com.ing.ingmortgage.entity.Customer;
+import com.ing.ingmortgage.entity.LoanDetails;
 import com.ing.ingmortgage.entity.LoanMaster;
 import com.ing.ingmortgage.exception.AffordabilityException;
 import com.ing.ingmortgage.exception.AgeException;
 import com.ing.ingmortgage.exception.EmailException;
+import com.ing.ingmortgage.exception.LoanExistException;
 import com.ing.ingmortgage.repository.AffordabilityRepository;
 import com.ing.ingmortgage.repository.CustomerRepository;
+import com.ing.ingmortgage.repository.LoanRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoanServiceTest {
 	@Mock
 	private CustomerRepository customerRepository;
 	@Mock
+	private LoanRepository loanRepository;
+	@Mock
 	private AffordabilityRepository affordabilityRepository;
 	@InjectMocks
 	LoanServiceImpl loanServiceImpl;
 	LoanRequest loanRequest;
 	Affordability affordability;
+	List<LoanMaster>loanMasters;
 	Customer customer;
+	LoanMaster loanMaster;
+	List<LoanDetails> loanDetailsList = new ArrayList<>();
 	@Before
 	public void setup() {
 		ReflectionTestUtils.setField(loanServiceImpl,"passwordLength","8");
@@ -61,8 +71,8 @@ public class LoanServiceTest {
 		affordability.setAffordableAmount(10000.0);
 		affordability.setMaritalStatus("marriedwithonekid");
 	    customer=new Customer();
-		LoanMaster loanMaster=new LoanMaster();
-		List<LoanMaster>loanMasters=new ArrayList<>();
+	    loanMaster=new LoanMaster();
+		loanMasters=new ArrayList<>();
 		loanMaster.setLoanId(1L);
 		BeanUtils.copyProperties(loanRequest, customer);
 		BeanUtils.copyProperties(loanRequest, loanMaster);
@@ -70,6 +80,16 @@ public class LoanServiceTest {
 		customer.setPassword("234fgf#w");
 		loanMasters.add(loanMaster);
 		customer.setLoanMasters(loanMasters);
+		
+		LoanDetails loanDetails = new LoanDetails();
+		loanDetails.setLoanMaster(loanMaster);
+		loanDetails.setBeginningBalance(20000.00);
+		loanDetails.setEndingBalance(0.0);
+		loanDetails.setInterestAmount(40000.00);
+		loanDetails.setStatus("open");
+
+		loanDetailsList.add(loanDetails);
+		loanMaster.setLoanDetails(loanDetailsList);
 		
 	}
 	
@@ -99,6 +119,38 @@ public class LoanServiceTest {
 		loanRequest.setLoanObligation(20000.0);
 		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);
         assertNotNull(customerCredential);
+	}
+	
+	@Test(expected = LoanExistException.class)
+	public void testLoanExistException() {
+		Mockito.when(customerRepository.findByEmailOrPhoneNumber(Mockito.any(),Mockito.any())).thenReturn(Optional.of(customer));
+		Mockito.when(loanRepository.findByCustomerAndLoanStatus(Mockito.any(),Mockito.any())).thenReturn(loanMasters);
+		CustomerCredential customerCredential= loanServiceImpl.applyLoan(loanRequest);
+        assertNotNull(customerCredential);
+	}
+
+	@Test
+	public void testGetLoanDetailsByIdPositive() {
+		Optional<LoanMaster> optLoanMaster = Optional.of(loanMaster);
+		Mockito.when(loanRepository.findByLoanIdAndLoanStatus(loanMaster.getLoanId(), "open"))
+				.thenReturn(optLoanMaster);
+		Mockito.when(loanRepository.findLoanDetailsByLoanId(loanMaster.getLoanId())).thenReturn(loanDetailsList);
+
+		List<LoanDetail> actualResponse = loanServiceImpl.getLoanDetails(loanMaster.getLoanId());
+
+		Assert.assertEquals(1, actualResponse.size());
+
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetLoanDetailsByIdNegative() {
+		Optional<LoanMaster> optLoanMaster = null;
+		Mockito.when(loanRepository.findByLoanIdAndLoanStatus(loanMaster.getLoanId(), "open"))
+				.thenReturn(optLoanMaster);
+
+		List<LoanDetail> actualResponse = loanServiceImpl.getLoanDetails(loanMaster.getLoanId());
+		Assert.assertEquals(1, actualResponse.size());
+
 	}
 
 }

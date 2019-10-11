@@ -1,11 +1,11 @@
 package com.ing.ingmortgage.util;
 
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 public class IngMortgageUtil {
 
-	
+	private IngMortgageUtil() {
+		
+	}
 	
 	public static final String SUCCESS = "successful";
 	public static final String PRODUCT_NOT_FOUND = "product not found";
