@@ -38,6 +38,7 @@ import com.ing.ingmortgage.repository.LoanRepository;
 import com.ing.ingmortgage.util.EMICalculator;
 import com.ing.ingmortgage.util.EmailValidator;
 import com.ing.ingmortgage.util.IngMortgageUtil;
+import java.util.Arrays;
 
 /**
  * @since 2019-10-10 This class includes methods for apply for loan, get loan
