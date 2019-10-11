@@ -26,12 +26,12 @@ public class LoginServiceImpl implements LoginService{
 		{
 			throw new CommonException(IngMortgageUtil.CUSTOMER_NOT_FOUND);
 		}
-		 {
+		
 		LoginResponse loginResponse=new LoginResponse();
 		loginResponse.setCif(customer.getCif());
 				
 		return loginResponse;
-		}
+		
 	}
 
 }

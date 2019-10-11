@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IngMortgageUtil {
 
+	
+	
 	public static final String SUCCESS = "successful";
 	public static final String PRODUCT_NOT_FOUND = "product not found";
 	public static final String SERVER_ISSUE = "Server down";

@@ -1,5 +1,8 @@
 package com.ing.ingmortgage.util;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class EMICalculator {
 	public static Double calculatedEMI(Double principal, Double rateOfInterest, Integer tenure) {
 		Double emi;

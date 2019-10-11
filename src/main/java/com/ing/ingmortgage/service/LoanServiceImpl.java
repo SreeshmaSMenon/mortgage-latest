@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Base64;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +45,7 @@ import com.ing.ingmortgage.util.IngMortgageUtil;
  */
 @Service
 public class LoanServiceImpl implements LoanService {
-	private static Logger LOGGER = LoggerFactory.getLogger(LoanServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LoanServiceImpl.class);
 	@Autowired
 	private CustomerRepository customerRepository;
 	@Autowired
@@ -146,7 +146,7 @@ public class LoanServiceImpl implements LoanService {
 		}
 		byte[] salt = new byte[length];
 		RAND.nextBytes(salt);
-		return Optional.of(salt.toString());
+		return Optional.of(Arrays.toString(salt));
 	}
 
 	/**

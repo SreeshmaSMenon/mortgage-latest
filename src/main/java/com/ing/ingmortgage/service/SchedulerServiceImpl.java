@@ -49,12 +49,12 @@ public class SchedulerServiceImpl implements SchedulerService{
 				 Account account=accountRepository.findByCustomer(optionalCustomer.get()).get(0);
 				 Double accountBalance=account.getBalance();
 				 Optional<LoanDetails> loanDetails=loanDetailsRepository.findByLoanMasterAndStatusOrderByPaymentDateAsc(loan,"NotPaid");
-				 if(loanDetails.isPresent()) {
-					 if(accountBalance>=loanDetails.get().getScheduledPayment()) {
+				 if(loanDetails.isPresent()&&accountBalance>=loanDetails.get().getScheduledPayment()) {
+					
 						 loanDetailsRepository.updateStatus("paid", loan, loanDetails.get().getPaymentDate());
 						 if(loanDetails.get().getEndingBalance()==0)
 							 loanRepository.updateStatus("close",loan.getLoanId());
-					 }
+					 
 				 }
 				 
 			 });
